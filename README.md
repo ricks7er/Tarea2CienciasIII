@@ -1,4 +1,4 @@
-# Tarea2 CienciasIII
+# Ejercicio de expresiones aritméticas con variable
 Respositorio para la segunda tanda de tareas de ciencias III
 
 Daniel Esteban Ladino Torres -20142020043 <br />
