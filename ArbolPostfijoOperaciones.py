@@ -1,5 +1,6 @@
 from pila import *
 import sys
+import re
 
 class Nodo:
 	def __init__(self , valor):
@@ -9,6 +10,7 @@ class Nodo:
 
 class ArbolPosFijo:
         diccionario={}
+        
         def buscarOperador(self, caracter):
                 if (caracter == '+' or caracter == '-' or caracter == '*'
                         or caracter == '/'):
@@ -42,7 +44,29 @@ class ArbolPosFijo:
                 except:
                         return (self.getValorDiccionario(arbol.valor))[0]
            
-
+        def evaluarCaracteres(self, aux, l1 , l2):
+                errores =0 
+                for x in aux:
+                        if re.match('^[-+]?[0-9]+$', x):
+                                l1.append("val")
+                                l2.append(x)
+                                #print ("Numero")
+                        elif re.match('^[a-z][a-zA-Z_$0-9]*$', x):
+                                l1.append("var")
+                                l2.append(x)
+                                #print ("Letra")
+                        elif re.match('[-|=|+|*|/]', x):
+                                l1.append("ope")
+                                l2.append(x)
+                                #print ("Operaciones")
+                        else:
+                                l1.append("Token No Valido")
+                                l2.append(x)
+                                errores+=1
+                                #print ("Operaciones")
+                return errores
+                                
+                                
 
         def construirArbol(self, posfijo):
                 posfijo.pop()
@@ -74,19 +98,33 @@ class ArbolPosFijo:
                 arbol = pilaOperador.desapilar()
                 self.construirDiccionario(variable,self.evaluar(arbol))
                 return self.evaluar(arbol)
-
-
-
+        def imprimirTablaTokens(self,l1 , l2):
+                  a = 0
+                  for m in l1:
+                          print(l1[a] + "   " + l2[a])
+                          a = a+1
+      
 
 class Main:
+        lTipo = []
+        lValor = []
         respuesta=1
+        err =0
         while(respuesta):
           obj = ArbolPosFijo()
           print("Ingrese los valores del arbol en PosFija separados por un espacio:")
           valorIngresado = input() #Python 2.x raw_input(), 3.x input()
           aux = valorIngresado.split(" ")
-          print ("El valor resultante es: "+ str(obj.construirArbol(aux)))
-          print("diccionario:"+ str(obj.getValorDiccionario("a")))
+          err=obj.evaluarCaracteres(aux, lTipo, lValor)
+          if(err==0):
+                  
+                  print ("El valor resultante es: "+ str(obj.construirArbol(aux)))
+          else:
+                  obj.imprimirTablaTokens(lTipo,lValor)
+                  sys.exit()
+                  
+          #print("diccionario:"+ str(obj.getValorDiccionario("a")))
           print("Desea continuar? Ingrese 1 para continuar, de lo contrario ingrese 0")
           if(input()=='0'):
-            respuesta=0
+                  obj.imprimirTablaTokens(lTipo,lValor)
+                  respuesta=0
