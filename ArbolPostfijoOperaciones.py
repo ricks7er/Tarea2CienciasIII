@@ -1,6 +1,7 @@
 from pila import *
 import sys
 import re
+import ply.lex as lex
 
 class Nodo:
 	def __init__(self , valor):
@@ -43,7 +44,32 @@ class ArbolPosFijo:
                         return float(arbol.valor)
                 except:
                         return (self.getValorDiccionario(arbol.valor))[0]
-           
+
+        def analisis_lex(self,caracteres):
+                tokens = [ 'variable','entero','mas','menos','multiplicacion','division', 'igual' ]
+                t_ignore = ' \t\n'
+                t_mas = r'\+'
+                t_menos = r'-'
+                t_multiplicacion = r'\*'
+                t_division = r'/'
+                t_igual = r'='
+                #t_variable = r'[a-zA-Z_$0-9]+$'
+                t_variable = r'[a-z][a-zA-Z0-9_]*'
+                def t_entero(t):
+                        r'\d+'
+                        t.value = int(t.value)
+                        return t
+                def t_error(t):
+                        print("Caracteres ilegales '%s'" % t.value[0])
+                        t.lexer.skip(1)
+                lex.lex()
+                lex.input(caracteres)
+                while True:
+                        tok = lex.token()
+                        if not tok: break
+                        print(str(tok.value) + " - " + str(tok.type))
+
+                
         def evaluarCaracteres(self, aux, l1 , l2):
                 errores =0 
                 for x in aux:
@@ -112,17 +138,23 @@ class Main:
         err =0
         while(respuesta):
           obj = ArbolPosFijo()
-          print("Ingrese los valores del arbol en PosFija separados por un espacio:")
-          valorIngresado = input() #Python 2.x raw_input(), 3.x input()
-          aux = valorIngresado.split(" ")
-          err=obj.evaluarCaracteres(aux, lTipo, lValor)
-          if(err==0):
-                  
-                  print ("El valor resultante es: "+ str(obj.construirArbol(aux)))
-          else:
-                  obj.imprimirTablaTokens(lTipo,lValor)
-                  sys.exit()
-                  
+          #print("Ingrese los valores del arbol en PosFija separados por un espacio:")
+          #valorIngresado = input() #Python 2.x raw_input(), 3.x input()
+          filename = sys.argv[1]
+          file = open(filename)
+          characters = file.read()
+          aux = characters.split(" ")
+          file.close()
+          obj.analisis_lex(characters)
+                           
+          #err=obj.evaluarCaracteres(aux, lTipo, lValor)
+##          if(err==0):
+##                  
+##                  print ("El valor resultante es: "+ str(obj.construirArbol(aux)))
+##          else:
+##                  obj.imprimirTablaTokens(lTipo,lValor)
+##                  sys.exit()
+##                  
           #print("diccionario:"+ str(obj.getValorDiccionario("a")))
           print("Desea continuar? Ingrese 1 para continuar, de lo contrario ingrese 0")
           if(input()=='0'):
